@@ -41,8 +41,8 @@ private:
 		void m_Reset(void);
 	};
 
-	std::vector< std::shared_ptr<Star> > m_nearStars;
-	std::vector< std::shared_ptr<Star> > m_farStars;
+	std::vector< std::unique_ptr<Star> > m_nearStars;
+	std::vector< std::unique_ptr<Star> > m_farStars;
 	sf::Vector2f m_velocity;
 	sf::Clock m_randClock;
 
@@ -58,7 +58,7 @@ private:
 	sf::Texture m_starTexture;
 	sf::Vector2f m_texCoords[4];
 
-	void m_boundStar(std::shared_ptr<Star>& star, const sf::FloatRect& viewArea);
+	void m_boundStar(Star& star, const sf::FloatRect& viewArea);
 	void draw(sf::RenderTarget& rt, sf::RenderStates states)const override;
 };
 

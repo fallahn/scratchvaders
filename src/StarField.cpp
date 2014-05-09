@@ -85,10 +85,10 @@ StarField::StarField()
 	m_randTime			(Helpers::Random::Float(6.f, 15.f))
 {
 	for(auto i = 0u; i < 10u; i++)
-		m_nearStars.push_back(std::shared_ptr<Star>(new Star(900.f, 1800.f)));
+		m_nearStars.push_back(std::unique_ptr<Star>(new Star(900.f, 1800.f)));
 
 	for(auto i = 0u; i < 140u; ++i)
-		m_farStars.push_back(std::shared_ptr<Star>(new Star(200.f, 750.f)));
+		m_farStars.push_back(std::unique_ptr<Star>(new Star(200.f, 750.f)));
 
 	m_velocity.x = Helpers::Random::Float(-1.f, 1.f);
 	m_velocity.y = Helpers::Random::Float(-1.f, 1.f);
@@ -163,17 +163,17 @@ void StarField::Update(float dt, const sf::FloatRect& viewArea)
 	m_planetShader.setParameter("position", sf::Vector2f(m_planetPosition. x / m_planetResolution.x,1.f - ( m_planetPosition.y / m_planetResolution.y)));
 
 	//update near stars
-	for(auto star : m_nearStars)
+	for(auto& star : m_nearStars)
 	{
 		star->Update(dt, m_velocity);
-		m_boundStar(star, viewArea);
+		m_boundStar(*star, viewArea);
 	}
 
 	//update far stars
-	for(auto star : m_farStars)
+	for(auto& star : m_farStars)
 	{
 		star->Update(dt, -m_velocity);
-		m_boundStar(star, viewArea);
+		m_boundStar(*star, viewArea);
 	}
 }
 
@@ -181,7 +181,7 @@ void StarField::Update(float dt, const sf::FloatRect& viewArea)
 void StarField::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
 	sf::VertexArray farStars(sf::PrimitiveType::Quads);
-	for(auto star : m_farStars)
+	for(auto& star : m_farStars)
 	{
 		for(auto i = 0u; i < star->Shape.getPointCount(); i++)
 			farStars.append(sf::Vertex(star->Shape.getPoint(i) + star->Shape.getPosition(), star->Colour, m_texCoords[i]));
@@ -191,7 +191,7 @@ void StarField::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 	rt.draw(m_planetSprite, &m_planetShader);
 	
 	sf::VertexArray nearStars(sf::PrimitiveType::Quads);
-	for(auto star : m_nearStars)
+	for(auto& star : m_nearStars)
 	{
 		for(auto i = 0u; i < star->Shape.getPointCount(); i++)
 			nearStars.append(sf::Vertex(star->Shape.getPoint(i) + star->Shape.getPosition(), star->Colour, m_texCoords[i]));
@@ -199,14 +199,14 @@ void StarField::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 	rt.draw(nearStars, &m_starTexture);
 }
 
-void StarField::m_boundStar(std::shared_ptr<Star>& star, const sf::FloatRect& viewArea)
+void StarField::m_boundStar(Star& star, const sf::FloatRect& viewArea)
 {
-		sf::Vector2f position = star->Shape.getPosition();
+		sf::Vector2f position = star.Shape.getPosition();
 		if(position.x < 0) position.x += viewArea.width;
 		else if(position.x > viewArea.width) position.x -= viewArea.width;
 
 		if(position.y < 0) position.y += viewArea.height;
 		else if(position.y > viewArea.height) position.y -= viewArea.height;
 
-		star->Shape.setPosition(position);
+		star.Shape.setPosition(position);
 }

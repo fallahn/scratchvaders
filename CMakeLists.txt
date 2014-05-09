@@ -40,8 +40,8 @@ find_package(SFML 2 REQUIRED system window graphics audio)
 
 
 add_executable(scratchvaders main.cpp)
-target_link_libraries(BenchMark ${PROJECT_NAME})
-target_link_libraries(BenchMark ${SFML_LIBRARIES})
+target_link_libraries(scratchvaders ${PROJECT_NAME})
+target_link_libraries(scratchvaders ${SFML_LIBRARIES})
 
 
 	
